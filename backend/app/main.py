@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+
 
 from app.core.config import settings
+from app.db.database import get_db
+
 
 app = FastAPI(
     title=settings.app_name,
@@ -36,4 +41,14 @@ def version():
     return{
         "version":settings.app_version,
         "status":settings.environment   
+    }
+
+@app.get("/database-test")
+def database_test(db:Session = Depends(get_db)):
+    result = db.execute(text("SELECT 1"))
+    value = result.scalar()
+
+    return {
+        "database":"connected",
+        "test_result":value
     }
