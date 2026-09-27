@@ -52,3 +52,11 @@ def database_test(db:Session = Depends(get_db)):
         "database":"connected",
         "test_result":value
     }
+
+@app.get("/database-info")
+def database_info(db:Session = Depends(get_db)):
+    return{
+        "database": "SQLite",
+        "orm": "SQLAlchemy",
+        "status": "connected"
+    }
