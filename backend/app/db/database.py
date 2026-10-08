@@ -1,7 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-DATABASE_URL = "sqlite:///./hb_tradepro.db"
+from app.db.base import Base
+
+DATABASE_URL = "sqlite:///./Mt5TradeAppPro.db"
 
 engine = create_engine(
     DATABASE_URL,
@@ -24,3 +26,6 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def create_tables():
+    Base.metadata.create_all(bind=engine)

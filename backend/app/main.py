@@ -5,6 +5,7 @@ from sqlalchemy import text
 
 from app.core.config import settings
 from app.db.database import get_db
+from app.models.user import User
 
 
 app = FastAPI(
@@ -59,4 +60,23 @@ def database_info(db:Session = Depends(get_db)):
         "database": "SQLite",
         "orm": "SQLAlchemy",
         "status": "connected"
+    }
+
+
+@app.post("/users")
+def create_user(db: Session = Depends(get_db)):
+    user = User(
+        full_name = "API User",
+        email = "api@example.com"
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+    return{
+        "id":user.id,
+        "Full Name":user.full_name,
+        "Email":user.email,
+        "Is Active":user.is_active,
+        "Created At":user.created_at
     }
