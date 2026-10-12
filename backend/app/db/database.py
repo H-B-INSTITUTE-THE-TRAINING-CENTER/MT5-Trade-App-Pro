@@ -2,11 +2,11 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.db.base import Base
+from app.core.config import settings
 
-DATABASE_URL = "sqlite:///./Mt5TradeAppPro.db"
 
 engine = create_engine(
-    DATABASE_URL,
+    settings.database_url,
     echo=True
 )
 

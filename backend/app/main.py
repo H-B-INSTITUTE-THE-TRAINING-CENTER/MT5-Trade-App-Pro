@@ -66,8 +66,8 @@ def database_info(db:Session = Depends(get_db)):
 @app.post("/users")
 def create_user(db: Session = Depends(get_db)):
     user = User(
-        full_name = "API User",
-        email = "api@example.com"
+        full_name = "Demo trader",
+        email = "trader@example.com",
     )
     db.add(user)
     db.commit()
