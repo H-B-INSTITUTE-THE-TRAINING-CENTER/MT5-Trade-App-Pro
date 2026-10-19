@@ -1,11 +1,16 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import text
+from sqlalchemy import text,select
+from sqlalchemy.exc import IntegrityError
+
 
 
 from app.core.config import settings
 from app.db.database import get_db
 from app.models.user import User
+from app.schemas.user import UserCreate, UserRead
+
+from app.api.routes.users import router as users_router
 
 
 app = FastAPI(
@@ -13,6 +18,8 @@ app = FastAPI(
     description="Stock Market & MT5 Trading Platform",
     version=settings.app_version
 )
+
+app.include_router(users_router)
 
 
 @app.get("/")
@@ -63,20 +70,24 @@ def database_info(db:Session = Depends(get_db)):
     }
 
 
-@app.post("/users")
-def create_user(db: Session = Depends(get_db)):
-    user = User(
-        full_name = "Demo trader",
-        email = "trader@example.com",
-    )
-    db.add(user)
-    db.commit()
-    db.refresh(user)
 
-    return{
-        "id":user.id,
-        "Full Name":user.full_name,
-        "Email":user.email,
-        "Is Active":user.is_active,
-        "Created At":user.created_at
-    }
+
+@app.get("/users",response_model=list[UserRead])
+def get_users(db:Session = Depends(get_db)):
+    
+    statement = select(User).order_by(User.id)
+    users = db.scalars(statement).all()
+    return users
+
+@app.get("/users/{user_id}",response_model=UserRead)
+def get_user(user_id:int, db:Session = Depends(get_db)):
+    
+    user = db.get(User,user_id)
+    if user is None:
+        raise HTTPException(
+            status_code = status.HTTP_404_NOT_FOUND,
+            detail = "User not found"
+        )
+
+    return user
+
