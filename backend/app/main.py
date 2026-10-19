@@ -70,24 +70,3 @@ def database_info(db:Session = Depends(get_db)):
     }
 
 
-
-
-@app.get("/users",response_model=list[UserRead])
-def get_users(db:Session = Depends(get_db)):
-    
-    statement = select(User).order_by(User.id)
-    users = db.scalars(statement).all()
-    return users
-
-@app.get("/users/{user_id}",response_model=UserRead)
-def get_user(user_id:int, db:Session = Depends(get_db)):
-    
-    user = db.get(User,user_id)
-    if user is None:
-        raise HTTPException(
-            status_code = status.HTTP_404_NOT_FOUND,
-            detail = "User not found"
-        )
-
-    return user
-
